@@ -11,8 +11,9 @@ const jwtStrategy = require('./passport/jwt')
 
 // const authRouter = require('./routers/auth')
 // const userRouter = require("./routers/users")
-// const blogRouter = require('./routers/blogs')
 // const postRouter = require('./routers/posts')
+
+/** Post-MVP  **/
 // const commentRouter = require('./routers/comments')
 // const rssRouter = require('./routers/rss')
 // const dashboardRouter = require('./routers/dashboard')
@@ -33,10 +34,11 @@ app.use(express.json())
 // Mount routers
 // app.use('/api', authRouter)
 // app.use('/api/users', userRouter)
-// app.use('/api/blogs', blogRouter)
 // app.use('/api/posts', postRouter)
-// app.use('/api/comments', commentRouter)
 // app.use('/api/rss', rssRouter)
+
+/** Post-MVP  **/
+// app.use('/api/comments', commentRouter)
 // app.use('/api/dashboard', dashboardRouter)
 
 // Catch-all 404
