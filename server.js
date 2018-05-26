@@ -9,7 +9,7 @@ const { PORT, MONGODB_URI } = require("./config")
 const localStrategy = require("./passport/local")
 const jwtStrategy = require('./passport/jwt')
 
-// const authRouter = require('./routers/auth')
+const authRouter = require('./routers/auth')
 // const userRouter = require("./routers/users")
 // const postRouter = require('./routers/posts')
 
@@ -32,7 +32,7 @@ app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
 app.use(express.json())
 
 // Mount routers
-// app.use('/api', authRouter)
+app.use('/api', authRouter)
 // app.use('/api/users', userRouter)
 // app.use('/api/posts', postRouter)
 // app.use('/api/rss', rssRouter)
