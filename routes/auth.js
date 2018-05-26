@@ -12,7 +12,7 @@ const createAuthToken = user => {
 }
 
 const options = { session: false, failWithError: true }
-const localAuth = passport.authToken('local', options)
+const localAuth = passport.authenticate('local', options)
 
 router.post('/login', localAuth, (req, res) => {
   const authToken = createAuthToken(req.user)
