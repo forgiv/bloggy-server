@@ -2,9 +2,9 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 
 const userSchema = mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  blog: { type: String, required: true }
+  username: { type: String, required: [true, 'missing username'], unique: true },
+  password: { type: String, required: [true, 'missing password'] },
+  blog: { type: String, required: [true, 'missing blog name'] }
 })
 
 userSchema.set('toObject', {

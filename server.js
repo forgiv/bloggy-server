@@ -9,9 +9,9 @@ const { PORT, MONGODB_URI } = require("./config")
 const localStrategy = require("./passport/local")
 const jwtStrategy = require('./passport/jwt')
 
-const authRouter = require('./routers/auth')
-// const userRouter = require("./routers/users")
-// const postRouter = require('./routers/posts')
+const authRouter = require('./routes/auth')
+// const userRouter = require("./routes/users")
+// const postRouter = require('./routes/posts')
 
 /** Post-MVP  **/
 // const commentRouter = require('./routers/comments')
