@@ -7,11 +7,12 @@ const postSchema = mongoose.Schema({
     required: true
   },
   title: { type: String, required: true },
-  content: String,
-  slug: String
+  content: { type: String, required: true },
+  slug: { type: String, required: true }
 }, { timestamps: true })
 
 postSchema.index({ title: 1, userId: 1 }, { unique: true })
+postSchema.index({ slug: 1, userId: 1 }, { unique: true })
 
 postSchema.set('toObject', {
   transform: function(doc, ret) {

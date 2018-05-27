@@ -1,6 +1,8 @@
 const router = require(`express`).Router()
 const User = require(`../models/user`)
+const Post = require('../models/post')
 
+// Register new user
 router.post(`/`, (req, res, next) => {
   const requiredFields = [`username`, `password`, 'blog']
   const missingField = requiredFields.find(field => !(field in req.body))
@@ -99,6 +101,47 @@ router.post(`/`, (req, res, next) => {
       }
       next(err)
     })
+})
+
+// Get all posts by user with username
+router.get('/:username/posts', (req, res, next) => {
+  const { username } = req.params
+  User.findOne({ username })
+    .then(user => {
+      if (!user) {
+        const err = new Error('User does not exist')
+        err.status = 404
+        return next(err)
+      }
+      return Post.find({ userId: user.id })
+    })
+    .then(posts => {
+      res.json(posts)
+    })
+    .catch(next)
+})
+
+// Get single post by user with username and slug
+router.get('/:username/:slug', (req, res, next) => {
+  const { username, slug } = req.params
+  User.findOne({ username })
+    .then(user => {
+      if (!user) {
+        const err = new Error('User does not exist')
+        err.status = 404
+        return next(err)
+      }
+      return Post.findOne({ userId: user.id, slug })
+    })
+    .then(post => {
+      if (!post) {
+        const err = new Error('Post does not exist')
+        err.status = 404
+        return next(err)
+      }
+      else res.json(post)
+    })
+    .catch(next)
 })
 
 module.exports = router
