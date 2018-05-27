@@ -7,7 +7,8 @@ const postSchema = mongoose.Schema({
     required: true
   },
   title: { type: String, required: true },
-  content: String
+  content: String,
+  slug: String
 }, { timestamps: true })
 
 postSchema.index({ title: 1, userId: 1 }, { unique: true })

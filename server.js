@@ -35,11 +35,11 @@ app.use(express.json())
 app.use('/api', authRouter)
 app.use('/api/users', userRouter)
 // app.use('/api/posts', postRouter)
-// app.use('/api/rss', rssRouter)
 
 /** Post-MVP  **/
 // app.use('/api/comments', commentRouter)
 // app.use('/api/dashboard', dashboardRouter)
+// app.use('/api/rss', rssRouter)
 
 // Catch-all 404
 app.use(function(req, res, next) {
