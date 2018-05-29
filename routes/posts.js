@@ -37,3 +37,28 @@ router.get('/:id', (req, res, next) => {
     })
     .catch(next)
 })
+
+// Create a new post
+router.post('/', (req, res, next) => {
+  const userId = req.user.id
+
+  const newPost = {}
+  const fields = ['title', 'content', 'slug']
+  for (const field of fields) {
+    if (req.body[field]) {
+      newPost[field] = req.body[field]
+    }
+    else {
+      const err = new Error(`Missing ${field} in request body`)
+      err.status = 400
+      return next(err)
+    }
+  }
+
+  if (newPost.title.length < 3) {
+    
+  }
+  if (newPost.content.length < 16) {
+
+  }
+})
