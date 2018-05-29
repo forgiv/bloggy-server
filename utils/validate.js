@@ -7,9 +7,12 @@
 const requiredFields = (body, fields) => {
   for (const field of fields) {
     if (!body[field]) {
-      const err = new Error(`Missing ${field} in request body`)
-      err.status = 400
-      return err
+      return {
+        code: 422,
+        reason: 'ValidationError',
+        message: `Missing ${field} in request body`,
+        location: field
+      }
     }
   }
   return null
