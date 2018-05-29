@@ -3,6 +3,12 @@ const router = require('express').Router()
 const mongoose = require('mongoose')
 
 const Post = require('../models/post')
+const {
+  requiredFields,
+  validateLengths,
+  validateSpaceAround,
+  validateSpaceInside
+} = require('../utils/validate')
 
 // Protect all router endpoints
 router.use(
@@ -45,17 +51,15 @@ router.post('/', (req, res, next) => {
 
   const newPost = { userId }
   const fields = ['title', 'content', 'slug']
-  for (const field of fields) {
-    if (req.body[field]) {
-      newPost[field] = req.body[field]
-    } else {
-      const err = new Error(`Missing ${field} in request body`)
-      err.status = 400
-      return next(err)
-    }
+  let err
+
+  err = requiredFields(req.body, fields)
+  if (!err) {
+    return res.status(422).json(err)
   }
 
-  // Validate length of fields
+  for (field in fields) newPost[field] = req.body[field]
+
   const sizedFields = {
     title: {
       min: 3,
@@ -69,47 +73,19 @@ router.post('/', (req, res, next) => {
       max: 32
     }
   }
-  const tooSmallField = Object.keys(sizedFields).find(
-    field =>
-      'min' in sizedFields[field] &&
-      newPost[field].trim().length < sizedFields[field].min
-  )
-  const tooLargeField = Object.keys(sizedFields).find(
-    field =>
-      'max' in sizedFields[field] &&
-      newPost[field].trim().length > sizedFields[field].max
-  )
-  if (tooSmallField || tooLargeField) {
-    return res.status(422).json({
-      code: 422,
-      reason: 'ValidationError',
-      message: tooSmallField
-        ? `Must be at least ${sizedFields[tooSmallField].min} characters long`
-        : `Must be at most ${sizedFields[tooLargeField].max} characters long`,
-      location: tooSmallField || tooLargeField
-    })
+  err = validateLengths(newPost, sizedFields)
+  if (!err) {
+    return res.status(422).json(err)
   }
 
-  // Validate leading/trailing whitespace
-  for (const field of fields) {
-    if (newPost[field].length === newPost[field].trim().length) {
-      return res.status(422).json({
-        code: 422,
-        reason: 'ValidationError',
-        message: 'Must not have leading, or trailing, whitespace',
-        location: field
-      })
-    }
+  err = validateSpaceAround(newPost, fields)
+  if (!err) {
+    return res.status(422).json(err)
   }
 
-  // Validate no whitespace (slug specific)
-  if (newPost.slug.includes(' ')) {
-    return res.status(422).json({
-      code: 422,
-      reason: 'ValidationError',
-      message: 'Must not contain whitespace',
-      location: 'slug'
-    })
+  err = validateSpaceInside(newPost, ['slug'])
+  if (!err) {
+    return res.status(422).json(err)
   }
 
   Post.create(newPost)
