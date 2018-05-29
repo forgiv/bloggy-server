@@ -54,7 +54,7 @@ router.post('/', (req, res, next) => {
   let err
 
   err = requiredFields(req.body, fields)
-  if (!err) {
+  if (err) {
     return res.status(422).json(err)
   }
 
@@ -90,7 +90,10 @@ router.post('/', (req, res, next) => {
 
   Post.create(newPost)
     .then(post => {
-      return res.status(201).location(`${req.originalUrl}/${post.id}`)
+      return res
+        .status(201)
+        .location(`${req.originalUrl}/${post.id}`)
+        .end()
     })
     .catch(err => {
       if (err.code === 11000) {

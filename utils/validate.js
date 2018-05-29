@@ -56,7 +56,7 @@ const validateLengths = (body, sizedFields) => {
 const validateSpaceAround = (body, fields) => {
   for (const field of fields) {
     if (field in body) {
-      if (body[field].length === body[field].trim().length) {
+      if (body[field].length > body[field].trim().length) {
         return {
           code: 422,
           reason: 'ValidationError',
