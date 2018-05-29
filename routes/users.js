@@ -1,6 +1,16 @@
 const router = require(`express`).Router()
 const User = require(`../models/user`)
 const Post = require('../models/post')
+const passport = require('passport')
+
+// Get data for logged in user
+const jwtAuth = passport.authenticate('jwt', {
+  session: false,
+  failWithError: true
+})
+router.get('/', jwtAuth, (req, res, next) => {
+  res.json(req.user)
+})
 
 // Register new user
 router.post(`/`, (req, res, next) => {
@@ -59,21 +69,22 @@ router.post(`/`, (req, res, next) => {
   }
   const tooSmallField = Object.keys(sizedFields).find(
     field =>
-    `min` in sizedFields[field] &&
-    req.body[field].trim().length < sizedFields[field].min
+      `min` in sizedFields[field] &&
+      req.body[field].trim().length < sizedFields[field].min
   )
   const tooLargeField = Object.keys(sizedFields).find(
     field =>
-    `max` in sizedFields[field] &&
-    req.body[field].trim().length > sizedFields[field].max
+      `max` in sizedFields[field] &&
+      req.body[field].trim().length > sizedFields[field].max
   )
 
   if (tooSmallField || tooLargeField) {
     return res.status(422).json({
       code: 422,
       reason: `ValidationError`,
-      message: tooSmallField ?
-        `Must be at least ${sizedFields[tooSmallField].min} characters long` : `Must be at most ${sizedFields[tooLargeField].max} characters long`,
+      message: tooSmallField
+        ? `Must be at least ${sizedFields[tooSmallField].min} characters long`
+        : `Must be at most ${sizedFields[tooLargeField].max} characters long`,
       location: tooSmallField || tooLargeField
     })
   }
@@ -138,8 +149,7 @@ router.get('/:username/:slug', (req, res, next) => {
         const err = new Error('Post does not exist')
         err.status = 404
         return next(err)
-      }
-      else res.json(post)
+      } else res.json(post)
     })
     .catch(next)
 })
