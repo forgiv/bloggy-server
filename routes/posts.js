@@ -43,7 +43,7 @@ router.get('/:id', (req, res, next) => {
 router.post('/', (req, res, next) => {
   const userId = req.user.id
 
-  const newPost = {}
+  const newPost = { userId }
   const fields = ['title', 'content', 'slug']
   for (const field of fields) {
     if (req.body[field]) {
