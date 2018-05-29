@@ -58,7 +58,7 @@ router.post('/', (req, res, next) => {
     return res.status(422).json(err)
   }
 
-  for (field in fields) newPost[field] = req.body[field]
+  for (field of fields) newPost[field] = req.body[field]
 
   const sizedFields = {
     title: {
@@ -74,17 +74,17 @@ router.post('/', (req, res, next) => {
     }
   }
   err = validateLengths(newPost, sizedFields)
-  if (!err) {
+  if (err) {
     return res.status(422).json(err)
   }
 
   err = validateSpaceAround(newPost, fields)
-  if (!err) {
+  if (err) {
     return res.status(422).json(err)
   }
 
   err = validateSpaceInside(newPost, ['slug'])
-  if (!err) {
+  if (err) {
     return res.status(422).json(err)
   }
 
@@ -94,11 +94,94 @@ router.post('/', (req, res, next) => {
     })
     .catch(err => {
       if (err.code === 11000) {
-        err = new Error('Username/Title already exists')
+        err = new Error('Slug/Title already exists')
         err.status = 400
       }
       next(err)
     })
+})
+
+router.put('/:id', (req, res, next) => {
+  const userId = req.user.id
+  const { id } = req.params
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error(`The \`id\` is not valid`)
+    err.status = 400
+    return next(err)
+  }
+
+  const fields = ['title', 'content', 'slug']
+  const updateObj = {}
+
+  for (const field of fields) {
+    if (field in req.body) {
+      updateObj[field] = req.body[field]
+    }
+  }
+
+  if (Object.keys(updateObj).length === 0) {
+    const err = new Error('Missing update fields in request body')
+    err.status = 400
+    return next(err)
+  }
+
+  let err
+  const sizedFields = {
+    title: {
+      min: 3,
+      max: 64
+    },
+    content: {
+      min: 16
+    },
+    slug: {
+      min: 3,
+      max: 32
+    }
+  }
+  err = validateLengths(updateObj, sizedFields)
+  if (err) {
+    return res.status(422).json(err)
+  }
+
+  err = validateSpaceAround(updateObj, fields)
+  if (err) {
+    return res.status(422).json(err)
+  }
+
+  err = validateSpaceInside(updateObj, ['slug'])
+  if (err) {
+    return res.status(422).json(err)
+  }
+
+  Post.findById(id)
+    .then(post => {
+      if (post.userId !== userId) {
+        const err = new Error('Forbidden')
+        err.status = 403
+        return next(err)
+      }
+    })
+    .then(() => {
+      return Post.findByIdAndUpdate(id, updateObj)
+    })
+    .then(result => {
+      if (result) res.json(result)
+      else next()
+    })
+    .catch(next)
+})
+
+router.delete('/:id', (req, res, next) => {
+  const { id } = req.params
+  const userId = req.user.id
+
+  Post.findOneAndRemove({ _id: id, userId })
+    .then(() => {
+      res.status(204).end()
+    })
+    .catch(next)
 })
 
 module.exports = router
