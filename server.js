@@ -4,8 +4,9 @@ const express = require('express')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 const passport = require('passport')
+const cors = require('cors')
 
-const { PORT, MONGODB_URI } = require('./config')
+const { PORT, MONGODB_URI, CLIENT_ORIGIN } = require('./config')
 const localStrategy = require('./passport/local')
 const jwtStrategy = require('./passport/jwt')
 
@@ -22,6 +23,13 @@ passport.use(localStrategy)
 passport.use(jwtStrategy)
 
 const app = express()
+
+// Setup CORS
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN
+  })
+)
 
 // More verbose logging while in development
 // Skip logging when testing
