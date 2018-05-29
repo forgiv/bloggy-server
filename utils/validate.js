@@ -55,12 +55,14 @@ const validateLengths = (body, sizedFields) => {
  */
 const validateSpaceAround = (body, fields) => {
   for (const field of fields) {
-    if (body[field].length === body[field].trim().length) {
-      return {
-        code: 422,
-        reason: 'ValidationError',
-        message: 'Must not have leading, or trailing, whitespace',
-        location: field
+    if (field in body) {
+      if (body[field].length === body[field].trim().length) {
+        return {
+          code: 422,
+          reason: 'ValidationError',
+          message: 'Must not have leading, or trailing, whitespace',
+          location: field
+        }
       }
     }
   }
@@ -75,12 +77,14 @@ const validateSpaceAround = (body, fields) => {
  */
 const validateSpaceInside = (body, fields) => {
   for (const field of fields) {
-    if (body[field].includes(' ')) {
-      return {
-        code: 422,
-        reason: 'ValidationError',
-        message: 'Must not contain whitespace',
-        location: field
+    if (field in body) {
+      if (body[field].includes(' ')) {
+        return {
+          code: 422,
+          reason: 'ValidationError',
+          message: 'Must not contain whitespace',
+          location: field
+        }
       }
     }
   }
