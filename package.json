@@ -1,9 +1,8 @@
 {
   "name": "bloggy-server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Server backend of bloggy app",
   "main": "server.js",
-  "repository": "null",
   "author": "Hiram Cruz <hiram0101@gmail.com>",
   "license": "MIT",
   "private": true,
