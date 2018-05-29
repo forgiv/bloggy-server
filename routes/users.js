@@ -114,6 +114,21 @@ router.post(`/`, (req, res, next) => {
     })
 })
 
+// Get name of users blog
+router.get('/:username', (req, res, next) => {
+  const { username } = req.params
+  User.findOne({ username })
+    .then(user => {
+      if (!user) {
+        const err = new Error('User does not exist')
+        err.status = 404
+        return next(err)
+      }
+      res.json({ blog: user.blog })
+    })
+    .catch(next)
+})
+
 // Get all posts by user with username
 router.get('/:username/posts', (req, res, next) => {
   const { username } = req.params
