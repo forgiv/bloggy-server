@@ -17,7 +17,6 @@ const postRouter = require('./routes/posts')
 /** Post-MVP  **/
 // const commentRouter = require('./routers/comments')
 // const rssRouter = require('./routers/rss')
-// const dashboardRouter = require('./routers/dashboard')
 
 passport.use(localStrategy)
 passport.use(jwtStrategy)
@@ -48,7 +47,6 @@ app.use('/api/posts', postRouter)
 
 /** Post-MVP  **/
 // app.use('/api/comments', commentRouter)
-// app.use('/api/dashboard', dashboardRouter)
 // app.use('/api/rss', rssRouter)
 
 // Catch-all 404
