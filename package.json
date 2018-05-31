@@ -1,11 +1,14 @@
 {
   "name": "bloggy-server",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Server backend of bloggy app",
   "main": "server.js",
   "author": "Hiram Cruz <hiram0101@gmail.com>",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "deploy": "git push heroku master"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.4",
