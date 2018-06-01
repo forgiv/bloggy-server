@@ -104,6 +104,7 @@ router.post('/', (req, res, next) => {
     })
 })
 
+// Update existing post
 router.put('/:id', (req, res, next) => {
   const userId = req.user.id
   const { id } = req.params
@@ -176,6 +177,7 @@ router.put('/:id', (req, res, next) => {
     .catch(next)
 })
 
+// Delete existing post
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params
   const userId = req.user.id
