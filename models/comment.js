@@ -18,7 +18,7 @@ const commentSchema = mongoose.Schema(
 )
 
 commentSchema.set('toObject', {
-  transform: (doc, ret) => {
+  transform: function(doc, ret) {
     ret.id = ret._id
     delete ret._id
     delete ret.__v

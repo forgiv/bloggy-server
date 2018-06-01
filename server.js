@@ -13,7 +13,7 @@ const jwtStrategy = require('./passport/jwt')
 const authRouter = require('./routes/auth')
 const userRouter = require('./routes/users')
 const postRouter = require('./routes/posts')
-const commentRouter = require('./routers/comments')
+const commentRouter = require('./routes/comments')
 
 /** Post-MVP  **/
 // const rssRouter = require('./routers/rss')

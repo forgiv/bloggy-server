@@ -6,6 +6,8 @@ const Comment = require('../models/comment')
 const User = require('../models/user')
 const Post = require('../models/post')
 
+const { validateLengths, validateSpaceAround } = require('../utils/validate')
+
 // Get all comments on a post
 router.get('/:username/:slug', (req, res, next) => {
   const { username, slug } = req.params
@@ -17,7 +19,7 @@ router.get('/:username/:slug', (req, res, next) => {
     })
     .then(post => {
       if (!post) return next()
-      return Comment.find({ postId: post.id })
+      return Comment.find({ postId: post.id }).populate('userId', 'username')
     })
     .then(comments => {
       res.json(comments)
@@ -44,13 +46,13 @@ router.get('/:commentId', (req, res, next) => {
 })
 
 // Protect endpoints after this
-router.use(
-  '/',
-  passport.authenticate('jwt', { sessions: false, failWithError: true })
-)
+const jwtAuth = passport.authenticate('jwt', {
+  session: false,
+  failWithError: true
+})
 
 // Get all of users own comments
-router.get('/', (req, res, next) => {
+router.get('/', jwtAuth, (req, res, next) => {
   const userId = req.user.id
 
   Comment.find({ userId })
@@ -59,7 +61,7 @@ router.get('/', (req, res, next) => {
 })
 
 // Create new comment
-router.post('/', (req, res, next) => {
+router.post('/', jwtAuth, (req, res, next) => {
   const { postId, content } = req.body
   const userId = req.user.id
   let err
@@ -87,13 +89,16 @@ router.post('/', (req, res, next) => {
       return Comment.create({ postId, content, userId })
     })
     .then(comment => {
-      return res.status(201).location(`${req.originalUrl}/${comment.id}`)
+      return res
+        .status(201)
+        .location(`${req.originalUrl}/${comment.id}`)
+        .end()
     })
     .catch(next)
 })
 
 // Update existing comment
-router.put('/:id', (req, res, next) => {
+router.put('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params
   const { content } = req.body
   const userId = req.user.id
@@ -130,7 +135,7 @@ router.put('/:id', (req, res, next) => {
 })
 
 // Delete existing comment
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params
   const userId = req.user.id
 
