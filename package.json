@@ -1,6 +1,6 @@
 {
   "name": "bloggy-server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Server backend of bloggy app",
   "main": "server.js",
   "author": "Hiram Cruz <hiram0101@gmail.com>",
