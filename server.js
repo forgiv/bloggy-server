@@ -13,9 +13,9 @@ const jwtStrategy = require('./passport/jwt')
 const authRouter = require('./routes/auth')
 const userRouter = require('./routes/users')
 const postRouter = require('./routes/posts')
+const commentRouter = require('./routers/comments')
 
 /** Post-MVP  **/
-// const commentRouter = require('./routers/comments')
 // const rssRouter = require('./routers/rss')
 
 passport.use(localStrategy)
@@ -44,9 +44,9 @@ app.use(express.json())
 app.use('/api', authRouter)
 app.use('/api/users', userRouter)
 app.use('/api/posts', postRouter)
+app.use('/api/comments', commentRouter)
 
 /** Post-MVP  **/
-// app.use('/api/comments', commentRouter)
 // app.use('/api/rss', rssRouter)
 
 // Catch-all 404
