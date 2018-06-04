@@ -25,9 +25,9 @@ const app = express()
 
 // Setup CORS
 app.use(
-  cors({
-    origin: CLIENT_ORIGIN
-  })
+  process.env.NODE_ENV === 'development'
+    ? cors()
+    : cors({ origin: CLIENT_ORIGIN })
 )
 
 // More verbose logging while in development
