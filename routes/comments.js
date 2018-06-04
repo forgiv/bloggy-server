@@ -19,7 +19,9 @@ router.get('/:username/:slug', (req, res, next) => {
     })
     .then(post => {
       if (!post) return next()
-      return Comment.find({ postId: post.id }).populate('userId', 'username')
+      return Comment.find({ postId: post.id })
+        .sort({ createdAt: 'desc' })
+        .populate('userId', 'username')
     })
     .then(comments => {
       res.json(comments)
