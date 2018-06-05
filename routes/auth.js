@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
-const router = require("express").Router()
+const router = require('express').Router()
 
 const { JWT_SECRET, JWT_EXPIRY } = require('../config')
 
