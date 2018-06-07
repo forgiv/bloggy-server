@@ -6,9 +6,11 @@ const mongoose = require(`mongoose`)
 const { TEST_MONGODB_URI } = require(`../config`)
 
 const User = require(`../models/user`)
-const Post = require(`../models/post`)
+const Post = require('../models/post')
+const Comment = require('../models/comment')
 const seedUsers = require('../db/seed/users')
 const seedPosts = require(`../db/seed/posts`)
+const seedComments = require('../db/seed/comments')
 
 const expect = chai.expect
 
@@ -16,8 +18,9 @@ chai.use(chaiHttp)
 
 const testUser = { username: `user0`, password: `password` }
 const testId = `333333333333333333333300`
+const testPost = '000000000000000000000001'
 
-describe(`Bloggy API - Posts`, function() {
+describe(`Bloggy API - Comments`, function() {
   let token
 
   before(function() {
@@ -27,8 +30,18 @@ describe(`Bloggy API - Posts`, function() {
   })
 
   beforeEach(function() {
-    return Promise.all([User.insertMany(seedUsers), Post.insertMany(seedPosts)])
-      .then(() => Promise.all([User.createIndexes(), Post.createIndexes()]))
+    return Promise.all([
+      User.insertMany(seedUsers),
+      Post.insertMany(seedPosts),
+      Comment.insertMany(seedComments)
+    ])
+      .then(() =>
+        Promise.all([
+          User.createIndexes(),
+          Post.createIndexes(),
+          Comment.createIndexes()
+        ])
+      )
       .then(() =>
         chai
           .request(app)
@@ -48,13 +61,13 @@ describe(`Bloggy API - Posts`, function() {
     return mongoose.disconnect()
   })
 
-  describe(`GET /api/posts`, function() {
-    it(`should return the correct number of Posts`, function() {
+  describe(`GET /api/comments`, function() {
+    it(`should return the correct number of items`, function() {
       return Promise.all([
-        Post.find({ userId: testId }),
+        Comment.find({ userId: testId }),
         chai
           .request(app)
-          .get(`/api/posts`)
+          .get(`/api/comments`)
           .set(`authorization`, `Bearer ${token}`)
       ]).then(([data, res]) => {
         expect(res).to.have.status(200)
@@ -66,10 +79,10 @@ describe(`Bloggy API - Posts`, function() {
 
     it(`should return a list with the correct fields`, function() {
       return Promise.all([
-        Post.find({ userId: testId }),
+        Comment.find({ userId: testId }),
         chai
           .request(app)
-          .get(`/api/posts`)
+          .get(`/api/comments`)
           .set(`authorization`, `Bearer ${token}`)
       ]).then(([data, res]) => {
         expect(res).to.have.status(200)
@@ -80,27 +93,26 @@ describe(`Bloggy API - Posts`, function() {
           expect(item).to.be.a(`object`)
           expect(item).to.have.keys(
             `id`,
-            `title`,
-            `content`,
-            `createdAt`,
-            `updatedAt`,
-            `userId`,
-            `slug`
+            'userId',
+            'postId',
+            'createdAt',
+            'updatedAt',
+            'content'
           )
         })
       })
     })
   })
 
-  describe(`GET /api/posts/:id`, function() {
-    it(`should return correct Post`, function() {
+  describe(`GET /api/comments/:id`, function() {
+    it(`should return correct item`, function() {
       let data
-      return Post.findOne({ userId: testId })
+      return Comment.findOne({ userId: testId })
         .then(_data => {
           data = _data
           return chai
             .request(app)
-            .get(`/api/posts/${data.id}`)
+            .get(`/api/comments/${data.id}`)
             .set(`authorization`, `Bearer ${token}`)
         })
         .then(res => {
@@ -109,15 +121,13 @@ describe(`Bloggy API - Posts`, function() {
           expect(res.body).to.be.an(`object`)
           expect(res.body).to.have.keys(
             `id`,
-            `title`,
-            `content`,
-            `createdAt`,
-            `updatedAt`,
-            `userId`,
-            `slug`
+            'content',
+            'userId',
+            'postId',
+            'createdAt',
+            'updatedAt'
           )
           expect(res.body.id).to.equal(data.id)
-          expect(res.body.title).to.equal(data.title)
           expect(res.body.content).to.equal(data.content)
         })
     })
@@ -125,7 +135,7 @@ describe(`Bloggy API - Posts`, function() {
     it(`should respond with status 400 and an error message when \`id\` is not valid`, function() {
       return chai
         .request(app)
-        .get(`/api/posts/INVALID`)
+        .get(`/api/comments/INVALID`)
         .set(`authorization`, `Bearer ${token}`)
         .then(res => {
           expect(res).to.have.status(400)
@@ -134,20 +144,19 @@ describe(`Bloggy API - Posts`, function() {
     })
   })
 
-  describe(`POST /api/posts`, function() {
+  describe(`Post /api/comments`, function() {
     it(`should create and return a new item when provided valid data`, function() {
-      const newItem = {
-        title: `The best article about cats ever!`,
-        content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...`,
-        slug: `this-is-a-new-post`
-      }
       let res
+      const newItem = {
+        postId: testPost,
+        content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...`
+      }
       return chai
         .request(app)
-        .post(`/api/posts`)
+        .post(`/api/comments`)
         .send(newItem)
         .set(`authorization`, `Bearer ${token}`)
-        .then(function(_res) {
+        .then(_res => {
           res = _res
           expect(res).to.have.status(201)
           expect(res).to.have.header(`location`)
@@ -155,55 +164,50 @@ describe(`Bloggy API - Posts`, function() {
           expect(res.body).to.be.a(`object`)
           expect(res.body).to.have.keys(
             `id`,
-            `title`,
-            `content`,
-            `createdAt`,
-            `updatedAt`,
-            `userId`,
-            `slug`
+            'content',
+            'userId',
+            'postId',
+            'createdAt',
+            'updatedAt'
           )
-          return Post.findById(res.body.id)
+          return Comment.findById(res.body.id)
         })
         .then(data => {
-          expect(res.body.title).to.equal(data.title)
           expect(res.body.content).to.equal(data.content)
-          expect(res.body.slug).to.equal(data.slug)
         })
     })
 
-    it(`should return an error when posting an object with a missing "title" field`, function() {
+    it(`should return an error when commenting an object with a missing "content" field`, () => {
       const newItem = {
-        content: `Lorem ipsum dolor sit amet, sed do eiusmod tempor...`,
-        slug: 'this-a-a-slug'
+        postId: testPost
       }
 
       return chai
         .request(app)
-        .post(`/api/posts`)
+        .post(`/api/comments`)
         .set(`authorization`, `Bearer ${token}`)
         .send(newItem)
         .then(res => {
           expect(res).to.have.status(422)
           expect(res).to.be.json
           expect(res.body).to.be.a(`object`)
-          expect(res.body.message).to.equal(`Missing title in request body`)
+          expect(res.body.message).to.equal(`Missing content in request body`)
         })
     })
   })
 
-  describe(`PUT /api/posts/:id`, function() {
-    it(`should update the Post when provided valid data`, function() {
+  describe(`PUT /api/comments/:id`, () => {
+    it(`should update the Comment when provided valid data`, () => {
       const updateItem = {
-        title: `What about dogs?!`,
         content: `woof woof mother trrucker`
       }
       let data
-      return Post.findOne({ userId: testId })
+      return Comment.findOne({ userId: testId })
         .then(_data => {
           data = _data
           return chai
             .request(app)
-            .put(`/api/posts/${data.id}`)
+            .put(`/api/comments/${data.id}`)
             .set(`authorization`, `Bearer ${token}`)
             .send(updateItem)
         })
@@ -213,16 +217,14 @@ describe(`Bloggy API - Posts`, function() {
           expect(res.body).to.be.a(`object`)
           expect(res.body).to.have.keys(
             `id`,
-            `title`,
-            `content`,
-            `createdAt`,
-            `updatedAt`,
-            `userId`,
-            `slug`
+            'content',
+            'userId',
+            'postId',
+            'createdAt',
+            'updatedAt'
           )
 
           expect(res.body.id).to.equal(data.id)
-          expect(res.body.title).to.equal(updateItem.title)
           expect(res.body.content).to.equal(updateItem.content)
         })
     })
@@ -235,7 +237,7 @@ describe(`Bloggy API - Posts`, function() {
 
       return chai
         .request(app)
-        .put(`/api/posts/INVALID`)
+        .put(`/api/comments/INVALID`)
         .set(`authorization`, `Bearer ${token}`)
         .send(updateItem)
         .then(res => {
@@ -252,7 +254,7 @@ describe(`Bloggy API - Posts`, function() {
 
       return chai
         .request(app)
-        .put(`/api/posts/333333333333333333333300`)
+        .put(`/api/comments/333333333333333333333300`)
         .set(`authorization`, `Bearer ${token}`)
         .send(updateItem)
         .then(res => {
@@ -263,50 +265,48 @@ describe(`Bloggy API - Posts`, function() {
     it(`should return an error when missing update fields`, function() {
       const updateItem = {}
       let data
-      return Post.findOne({ userId: testId })
+      return Comment.findOne({ userId: testId })
         .then(_data => {
           data = _data
           return chai
             .request(app)
-            .put(`/api/posts/${data.id}`)
+            .put(`/api/comments/${data.id}`)
             .set(`authorization`, `Bearer ${token}`)
             .send(updateItem)
         })
         .then(res => {
-          expect(res).to.have.status(400)
+          expect(res).to.have.status(422)
           expect(res).to.be.json
           expect(res.body).to.be.a(`object`)
-          expect(res.body.message).to.equal(
-            `Missing update fields in request body`
-          )
+          expect(res.body.message).to.equal(`Missing content in request body`)
         })
     })
   })
 
-  describe(`DELETE /api/posts/:id`, function() {
+  describe(`DELETE /api/comments/:id`, function() {
     it(`should delete an existing document and respond with 204`, function() {
       let data
-      return Post.findOne({ userId: testId })
+      return Comment.findOne({ userId: testId })
         .then(_data => {
           data = _data
           return chai
             .request(app)
-            .delete(`/api/posts/${data.id}`)
+            .delete(`/api/comments/${data.id}`)
             .set(`authorization`, `Bearer ${token}`)
         })
         .then(function(res) {
           expect(res).to.have.status(204)
-          return Post.count({ _id: data.id })
+          return Comment.count({ _id: data.id })
         })
         .then(count => {
           expect(count).to.equal(0)
         })
     })
 
-    it(`should respond with 404 when document does not exist`, function() {
+    it(`should respond with 204 when document does not exist`, function() {
       return chai
         .request(app)
-        .delete(`/api/posts/DOESPostXIST`)
+        .delete(`/api/comments/333333333333333333333300`)
         .set(`authorization`, `Bearer ${token}`)
         .then(res => {
           expect(res).to.have.status(204)

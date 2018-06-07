@@ -6,7 +6,11 @@ const Comment = require('../models/comment')
 const User = require('../models/user')
 const Post = require('../models/post')
 
-const { validateLengths, validateSpaceAround } = require('../utils/validate')
+const {
+  validateLengths,
+  validateSpaceAround,
+  requiredFields
+} = require('../utils/validate')
 
 // Get all comments on a post
 router.get('/:username/:slug', (req, res, next) => {
@@ -74,6 +78,11 @@ router.post('/', jwtAuth, (req, res, next) => {
     return next(err)
   }
 
+  err = requiredFields(req.body, ['content', 'postId'])
+  if (err) {
+    return res.status(422).json(err)
+  }
+
   const sizedFields = { content: { min: 3, max: 300 } }
   err = validateLengths({ content }, sizedFields)
   if (err) {
@@ -94,7 +103,7 @@ router.post('/', jwtAuth, (req, res, next) => {
       return res
         .status(201)
         .location(`${req.originalUrl}/${comment.id}`)
-        .end()
+        .json(comment)
     })
     .catch(next)
 })
@@ -112,6 +121,11 @@ router.put('/:id', jwtAuth, (req, res, next) => {
     return next(err)
   }
 
+  err = requiredFields(req.body, ['content'])
+  if (err) {
+    return res.status(422).json(err)
+  }
+
   const sizedFields = { content: { min: 3, max: 300 } }
   err = validateLengths({ content }, sizedFields)
   if (err) {
@@ -126,8 +140,8 @@ router.put('/:id', jwtAuth, (req, res, next) => {
   Comment.findById(id)
     .then(comment => {
       if (!comment) return next()
-      if (comment.userId !== userId) return res.status(403).end()
-      return Comment.findByIdAndUpdate(id, { content })
+      if ('' + comment.userId !== userId) return res.status(403).end()
+      return Comment.findByIdAndUpdate(id, { $set: { content } }, { new: true })
     })
     .then(comment => {
       if (comment) return res.json(comment)
