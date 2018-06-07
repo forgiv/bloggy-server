@@ -7,7 +7,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "deploy": "git push heroku master"
+    "deploy": "git push heroku master",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=fah3l9y4b823l8423 mocha"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -21,5 +22,11 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "cross-env": "^5.1.6",
+    "mocha": "^5.2.0"
   }
 }

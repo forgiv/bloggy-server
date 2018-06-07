@@ -93,7 +93,7 @@ router.post('/', (req, res, next) => {
       return res
         .status(201)
         .location(`${req.originalUrl}/${post.id}`)
-        .end()
+        .json(post)
     })
     .catch(err => {
       if (err.code === 11000) {
@@ -144,7 +144,13 @@ router.put('/:id', (req, res, next) => {
       max: 32
     }
   }
-  err = validateLengths(updateObj, sizedFields)
+  const newSizedFields = {}
+  for (const key of Object.keys(updateObj)) {
+    if (key in sizedFields) {
+      newSizedFields[key] = sizedFields[key]
+    }
+  }
+  err = validateLengths(updateObj, newSizedFields)
   if (err) {
     return res.status(422).json(err)
   }
@@ -159,16 +165,21 @@ router.put('/:id', (req, res, next) => {
     return res.status(422).json(err)
   }
 
-  Post.findById(id)
+  Post.findOne({ _id: id })
     .then(post => {
-      if (post.userId !== userId) {
+      if (!post) return next()
+      if ('' + post.userId !== userId) {
         const err = new Error('Forbidden')
         err.status = 403
         return next(err)
       }
     })
     .then(() => {
-      return Post.findByIdAndUpdate(id, updateObj)
+      return Post.findOneAndUpdate(
+        { _id: id },
+        { $set: { ...updateObj } },
+        { new: true }
+      )
     })
     .then(result => {
       if (result) res.json(result)

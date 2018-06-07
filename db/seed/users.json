@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "333333333333333333333300",
+    "username": "user0",
+    "password": "$2a$10$o7hHxrfNUPQyqST7epuPkO3bhKO9CsMfrL8s51KsJCchoCpBmmnte",
+    "blog": "user0"
+  },
+  {
+    "_id": "333333333333333333333301",
+    "username": "user1",
+    "password": "$2a$10$o7hHxrfNUPQyqST7epuPkO3bhKO9CsMfrL8s51KsJCchoCpBmmnte",
+    "blog": "user1"
+  },
+  {
+    "_id": "333333333333333333333302",
+    "username": "user2",
+    "password": "$2a$10$o7hHxrfNUPQyqST7epuPkO3bhKO9CsMfrL8s51KsJCchoCpBmmnte",
+    "blog": "user2"
+  },
+  {
+    "_id": "333333333333333333333303",
+    "username": "user3",
+    "password": "$2a$10$o7hHxrfNUPQyqST7epuPkO3bhKO9CsMfrL8s51KsJCchoCpBmmnte",
+    "blog": "user3"
+  }
+]
