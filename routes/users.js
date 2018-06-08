@@ -8,7 +8,7 @@ const jwtAuth = passport.authenticate('jwt', {
   session: false,
   failWithError: true
 })
-router.get('/', jwtAuth, (req, res, next) => {
+router.get('/', jwtAuth, (req, res) => {
   res.json(req.user)
 })
 
