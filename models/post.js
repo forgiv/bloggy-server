@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const postSchema = mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
@@ -14,8 +14,8 @@ const postSchema = mongoose.Schema(
   { timestamps: true }
 )
 
-postSchema.index({ title: 1, userId: 1 }, { unique: true })
-postSchema.index({ slug: 1, userId: 1 }, { unique: true })
+postSchema.index({ title: 1, user: 1 }, { unique: true })
+postSchema.index({ slug: 1, user: 1 }, { unique: true })
 
 postSchema.set('toObject', {
   transform: function(doc, ret) {

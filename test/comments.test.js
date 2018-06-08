@@ -177,7 +177,7 @@ describe(`Bloggy API - Comments`, function() {
         })
     })
 
-    it(`should return an error when commenting an object with a missing "content" field`, () => {
+    it(`should return an error when creating an object with a missing "content" field`, () => {
       const newItem = {
         postId: testPost
       }
@@ -192,124 +192,6 @@ describe(`Bloggy API - Comments`, function() {
           expect(res).to.be.json
           expect(res.body).to.be.a(`object`)
           expect(res.body.message).to.equal(`Missing content in request body`)
-        })
-    })
-  })
-
-  describe(`PUT /api/comments/:id`, () => {
-    it(`should update the Comment when provided valid data`, () => {
-      const updateItem = {
-        content: `woof woof mother trrucker`
-      }
-      let data
-      return Comment.findOne({ userId: testId })
-        .then(_data => {
-          data = _data
-          return chai
-            .request(app)
-            .put(`/api/comments/${data.id}`)
-            .set(`authorization`, `Bearer ${token}`)
-            .send(updateItem)
-        })
-        .then(function(res) {
-          expect(res).to.have.status(200)
-          expect(res).to.be.json
-          expect(res.body).to.be.a(`object`)
-          expect(res.body).to.have.keys(
-            `id`,
-            'content',
-            'userId',
-            'postId',
-            'createdAt',
-            'updatedAt'
-          )
-
-          expect(res.body.id).to.equal(data.id)
-          expect(res.body.content).to.equal(updateItem.content)
-        })
-    })
-
-    it(`should respond with status 400 and an error message when \`id\` is not valid`, function() {
-      const updateItem = {
-        title: `What about dogs?!`,
-        content: `woof woof`
-      }
-
-      return chai
-        .request(app)
-        .put(`/api/comments/INVALID`)
-        .set(`authorization`, `Bearer ${token}`)
-        .send(updateItem)
-        .then(res => {
-          expect(res).to.have.status(400)
-          expect(res.body.message).to.eq(`The \`id\` is not valid`)
-        })
-    })
-
-    it(`should respond with a 404 for a missing id`, function() {
-      const updateItem = {
-        title: `What about dogs?!`,
-        content: `woof woof mother trruckerrr`
-      }
-
-      return chai
-        .request(app)
-        .put(`/api/comments/333333333333333333333300`)
-        .set(`authorization`, `Bearer ${token}`)
-        .send(updateItem)
-        .then(res => {
-          expect(res).to.have.status(404)
-        })
-    })
-
-    it(`should return an error when missing update fields`, function() {
-      const updateItem = {}
-      let data
-      return Comment.findOne({ userId: testId })
-        .then(_data => {
-          data = _data
-          return chai
-            .request(app)
-            .put(`/api/comments/${data.id}`)
-            .set(`authorization`, `Bearer ${token}`)
-            .send(updateItem)
-        })
-        .then(res => {
-          expect(res).to.have.status(422)
-          expect(res).to.be.json
-          expect(res.body).to.be.a(`object`)
-          expect(res.body.message).to.equal(`Missing content in request body`)
-        })
-    })
-  })
-
-  describe(`DELETE /api/comments/:id`, function() {
-    it(`should delete an existing document and respond with 204`, function() {
-      let data
-      return Comment.findOne({ userId: testId })
-        .then(_data => {
-          data = _data
-          return chai
-            .request(app)
-            .delete(`/api/comments/${data.id}`)
-            .set(`authorization`, `Bearer ${token}`)
-        })
-        .then(function(res) {
-          expect(res).to.have.status(204)
-          return Comment.count({ _id: data.id })
-        })
-        .then(count => {
-          expect(count).to.equal(0)
-        })
-    })
-
-    it(`should respond with 204 when document does not exist`, function() {
-      return chai
-        .request(app)
-        .delete(`/api/comments/333333333333333333333300`)
-        .set(`authorization`, `Bearer ${token}`)
-        .then(res => {
-          expect(res).to.have.status(204)
         })
     })
   })

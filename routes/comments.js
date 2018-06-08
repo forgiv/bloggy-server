@@ -12,38 +12,23 @@ const {
   requiredFields
 } = require('../utils/validate')
 
-// Get all comments on a post
-router.get('/:username/:slug', (req, res, next) => {
-  const { username, slug } = req.params
-
-  User.findOne({ username })
-    .then(user => {
-      if (!user) return next()
-      return Post.findOne({ userId: user.id, slug })
-    })
-    .then(post => {
-      if (!post) return next()
-      return Comment.find({ postId: post.id })
-        .sort({ createdAt: 'desc' })
-        .populate('userId', 'username')
-    })
-    .then(comments => {
-      res.json(comments)
-    })
-    .catch(next)
+// jwt authentication method
+const jwtAuth = passport.authenticate('jwt', {
+  session: false,
+  failWithError: true
 })
 
 // Get comment by id
-router.get('/:commentId', (req, res, next) => {
-  const { commentId } = req.params
+router.get('/:id', (req, res, next) => {
+  const { id } = req.params
 
-  if (!mongoose.Types.ObjectId.isValid(commentId)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid')
     err.status = 400
     return next(err)
   }
 
-  Comment.findById(commentId)
+  Comment.findById(id)
     .then(comment => {
       if (!comment) return next()
       res.json(comment)
@@ -51,10 +36,19 @@ router.get('/:commentId', (req, res, next) => {
     .catch(next)
 })
 
-// Protect endpoints after this
-const jwtAuth = passport.authenticate('jwt', {
-  session: false,
-  failWithError: true
+// Get comments for post
+router.get('/', (req, res, next) => {
+  const { postId } = req.query
+  
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid')
+    err.status = 400
+    return next(err)
+  }
+  
+  Comment.find({post:postId})
+    .then(comments => res.json(comments))
+    .catch(next)
 })
 
 // Get all of users own comments
@@ -70,6 +64,8 @@ router.get('/', jwtAuth, (req, res, next) => {
 router.post('/', jwtAuth, (req, res, next) => {
   const { postId, content } = req.body
   const userId = req.user.id
+  const fields = ['content', 'postId']
+  const newComment = { user:userId }
   let err
 
   if (!mongoose.Types.ObjectId.isValid(postId)) {
@@ -78,26 +74,22 @@ router.post('/', jwtAuth, (req, res, next) => {
     return next(err)
   }
 
-  err = requiredFields(req.body, ['content', 'postId'])
-  if (err) {
-    return res.status(422).json(err)
-  }
+  err = requiredFields(req.body, )
+  if (err) return res.status(422).json(err)
+  
+  for (const field of fields) newComment[field] = req.body[field]
 
   const sizedFields = { content: { min: 3, max: 300 } }
-  err = validateLengths({ content }, sizedFields)
-  if (err) {
-    return res.status(422).json(err)
-  }
+  err = validateLengths(newComment, sizedFields)
+  if (err) return res.status(422).json(err)
 
-  err = validateSpaceAround({ content }, ['content'])
-  if (err) {
-    return res.status(422).json(err)
-  }
+  err = validateSpaceAround(newComment, ['content'])
+  if (err) return res.status(422).json(err)
 
   Post.findById(postId)
     .then(post => {
       if (!post) return next()
-      return Comment.create({ postId, content, userId })
+      return Comment.create(newComment)
     })
     .then(comment => {
       return res
@@ -105,58 +97,6 @@ router.post('/', jwtAuth, (req, res, next) => {
         .location(`${req.originalUrl}/${comment.id}`)
         .json(comment)
     })
-    .catch(next)
-})
-
-// Update existing comment
-router.put('/:id', jwtAuth, (req, res, next) => {
-  const { id } = req.params
-  const { content } = req.body
-  const userId = req.user.id
-  let err
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    err = new Error('The `id` is not valid')
-    err.status = 400
-    return next(err)
-  }
-
-  err = requiredFields(req.body, ['content'])
-  if (err) {
-    return res.status(422).json(err)
-  }
-
-  const sizedFields = { content: { min: 3, max: 300 } }
-  err = validateLengths({ content }, sizedFields)
-  if (err) {
-    return res.status(422).json(err)
-  }
-
-  err = validateSpaceAround({ content }, ['content'])
-  if (err) {
-    return res.status(422).json(err)
-  }
-
-  Comment.findById(id)
-    .then(comment => {
-      if (!comment) return next()
-      if ('' + comment.userId !== userId) return res.status(403).end()
-      return Comment.findByIdAndUpdate(id, { $set: { content } }, { new: true })
-    })
-    .then(comment => {
-      if (comment) return res.json(comment)
-      next()
-    })
-    .catch(next)
-})
-
-// Delete existing comment
-router.delete('/:id', jwtAuth, (req, res, next) => {
-  const { id } = req.params
-  const userId = req.user.id
-
-  Comment.findOneAndRemove({ _id: id, userId })
-    .then(() => res.status(204).end())
     .catch(next)
 })
 
