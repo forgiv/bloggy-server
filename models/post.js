@@ -20,6 +20,8 @@ postSchema.index({ slug: 1, userId: 1 }, { unique: true })
 postSchema.set('toObject', {
   transform: function(doc, ret) {
     ret.id = ret._id
+    ret.createdAt = new Date(ret.createdAt).toDateString()
+    ret.updatedAt = new Date(ret.updatedAt).toDateString()
     delete ret._id
     delete ret.__v
   }
