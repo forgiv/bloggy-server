@@ -7,12 +7,14 @@
 const requiredFields = (body, fields) => {
   for (const field of fields) {
     if (!body[field]) {
-      return {
+      const err = {
         code: 422,
         reason: 'ValidationError',
         message: `Missing ${field} in request body`,
         location: field
       }
+      console.log(err)
+      return err
     }
   }
   return null
@@ -38,7 +40,7 @@ const validateLengths = (body, sizedFields) => {
       body[field].trim().length > sizedFields[field].max
   )
   if (tooSmallField || tooLargeField) {
-    return {
+    const err = {
       code: 422,
       reason: 'ValidationError',
       message: tooSmallField
@@ -46,6 +48,8 @@ const validateLengths = (body, sizedFields) => {
         : `Must be at most ${sizedFields[tooLargeField].max} characters long`,
       location: tooSmallField || tooLargeField
     }
+    console.log(err)
+    return err
   }
   return null
 }
@@ -60,12 +64,14 @@ const validateSpaceAround = (body, fields) => {
   for (const field of fields) {
     if (field in body) {
       if (body[field].length > body[field].trim().length) {
-        return {
+        const err = {
           code: 422,
           reason: 'ValidationError',
           message: 'Must not have leading, or trailing, whitespace',
           location: field
         }
+        console.log(err)
+        return err
       }
     }
   }
@@ -82,12 +88,14 @@ const validateSpaceInside = (body, fields) => {
   for (const field of fields) {
     if (field in body) {
       if (body[field].includes(' ')) {
-        return {
+        const err = {
           code: 422,
           reason: 'ValidationError',
           message: 'Must not contain whitespace',
           location: field
         }
+        console.log(err)
+        return err
       }
     }
   }
