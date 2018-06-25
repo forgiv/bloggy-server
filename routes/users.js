@@ -139,7 +139,7 @@ router.get('/:username/posts', (req, res, next) => {
         err.status = 404
         return next(err)
       }
-      return Post.find({ userId: user.id })
+      return Post.find({ userId: user.id }).sort({ createdAt: 'desc' })
     })
     .then(posts => {
       res.json(posts)
