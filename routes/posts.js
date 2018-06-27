@@ -41,7 +41,7 @@ router.post('/', (req, res, next) => {
     },
     slug: {
       min: 3,
-      max: 32
+      max: 64
     }
   }
   err = validateLengths(newPost, sizedFields)
