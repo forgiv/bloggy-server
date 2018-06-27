@@ -1,6 +1,5 @@
 const passport = require('passport')
 const router = require('express').Router()
-const mongoose = require('mongoose')
 
 const Post = require('../models/post')
 const {
