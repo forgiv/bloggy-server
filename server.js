@@ -24,11 +24,12 @@ passport.use(jwtStrategy)
 const app = express()
 
 // Setup CORS
-app.use(
-  process.env.NODE_ENV === 'development'
-    ? cors()
-    : cors({ origin: CLIENT_ORIGIN })
-)
+// app.use(
+//   process.env.NODE_ENV === 'development'
+//     ? cors()
+//     : cors({ origin: CLIENT_ORIGIN })
+// )
+app.use(cors())
 
 // More verbose logging while in development
 // Skip logging when testing
