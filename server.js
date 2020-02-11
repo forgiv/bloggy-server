@@ -70,7 +70,7 @@ app.use(function(err, req, res, next) {
 
 if (require.main === module) {
   mongoose
-    .connect(MONGODB_URI)
+    .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
     .then(instance => {
       const conn = instance.connections[0]
       console.info(
