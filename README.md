@@ -10,50 +10,173 @@ Bloggy is a centralized blogging platform with posts written in markdown languag
 
 <b>POST - /api/auth/login</b>
 
-- request: `{ username: String, password: String }`
-- response: `{ authToken: String }`
+request: 
+```js
+{ 
+  username: String, 
+  password: String
+}
+```
+response: 
+```js
+{ 
+  authToken: String 
+}
+```
 
 <b>POST - /api/auth/refresh</b>
 
-- request: `{ authToken: String }`
-- response: `{ authToken: String }`
+request: 
+```js
+{ 
+  authToken: String 
+}
+```
+response: 
+```js
+{ 
+  authToken: String 
+}
+```
 
 ### users
 
 <b>POST - /api/users</b>
 
-- request: `{ username: String, password: String, blog: String }`
-- response: `{ id: String, username: String, blog: String }`
+request: 
+```js
+{ 
+  username: String, 
+  password: String, 
+  blog: String 
+}
+```
+response: 
+```js
+{
+  id: String,
+  username: String,
+  blog: String
+}
+```
 
 <b>GET - /api/users/[username]</b>
 
-- response: `{ blog: String }`
+response: 
+```js
+{ 
+  blog: String 
+}
+```
 
 <b>GET - /api/users/[username]/posts</b>
 
-- response: `{ [ { title: String, content: String, slug: String, createdAt: DateString, updatedAt: DateString } ] }`
+response: 
+```js
+[ 
+  { 
+    title: String, 
+    content: String, 
+    slug: String, 
+    createdAt: DateString, 
+    updatedAt: DateString 
+  },
+  ...
+]
+```
 
 <b>GET - /api/users/[username]/[slug]</b>
 
-- response: `{ title: String, content: String, slug: String, createdAt: DateString, updatedAt: DateString }`
+response: 
+```js
+{ 
+  title: String, 
+  content: String, 
+  slug: String, 
+  createdAt: DateString, 
+  updatedAt: DateString 
+}
+```
 
 ### posts
 
 <b>POST - /api/posts</b>
 
-- request: `{ headers: { authorization: 'Bearer [token]' }, body: { title: String, slug: String, content: String } }`
-- response: `{ status: 201, body: { title: String, content: String, slug: String, createdAt: DateString, updatedAt: DateString } }`
+request: 
+```js
+{ 
+  headers: { 
+      authorization: 'Bearer [token]'
+  }, 
+  body: { 
+    title: String, 
+    slug: String, 
+    content: String
+  } 
+}
+```
+response: 
+```js
+{ 
+  status: 201, 
+  body: { 
+    title: String, 
+    content: String, 
+    slug: String, 
+    createdAt: DateString, 
+    updatedAt: DateString
+  }
+}
+```
 
 ### comments
 
 <b>POST - /api/comments</b>
 
-- request: `{ headers: { authorization: 'Bearer [token]' }, body: { content: String, postId: String } }`
-- response: `{ status: 201, body: { id: String, content: String, userId: String, postId: String, createdAt: DateString, updatedAt: DateString } }`
+request: 
+```js
+{ 
+  headers: { 
+    authorization: 'Bearer [token]' 
+  }, 
+  body: { 
+    content: String, 
+    postId: String 
+  } 
+}
+```
+response: 
+```js
+{
+  status: 201, 
+  body: { 
+    id: String, 
+    content: String, 
+    userId: String, 
+    postId: String,
+    createdAt: DateString,
+    updatedAt: DateString 
+  }
+}
+```
 
 <b>GET - /api/comments/[username]/[slug]</b>
 
-- response: `{ [ { id: String, content: String, userId: { username: String }, postId: String, createdAt: DateString, updatedAt: DateString } ] }`
+response: 
+```js
+[ 
+  { 
+    id: String, 
+    content: String,
+    userId: { 
+      username: String
+    }, 
+    postId: String,
+    createdAt: DateString, 
+    updatedAt: DateString
+  }
+]
+```
 
 ## Tech/framework used
 
